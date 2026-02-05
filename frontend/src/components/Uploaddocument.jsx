@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Upload, FileText, Brain, Loader2, Check, AlertCircle, X, FileUp } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
-function UploadDocument() {
+function Uploaddocument() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -384,4 +384,4 @@ console.log(up)
   );
 }
 
-export default UploadDocument;
+export default Uploaddocument;

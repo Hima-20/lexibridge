@@ -14,7 +14,7 @@ import Techstack from './components/Techstack';
 import Aboutus from './components/Aboutus';
 import Disclaimer from './components/Disclaimer';
 import Analysis from './components/Analysis';  
-import UploadDocument from './components/UploadDocument'; 
+import Uploaddocument from './components/Uploaddocument'; 
 import './App.css';
 
 // Layout Component for consistent header/footer
@@ -87,7 +87,7 @@ function App() {
           <Route path="/upload" element={
             <Layout>
               <ProtectedRoute>
-                <UploadDocument />
+                <Uploaddocument />
               </ProtectedRoute>
             </Layout>
           } />
