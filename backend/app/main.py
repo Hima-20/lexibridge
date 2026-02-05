@@ -900,7 +900,7 @@ async def startup_event():
 #     print(f"🤖 AI Service: {'✅ Available' if groq_client else '⚠️  Mock (configure GROQ_API)'}")
 #     print(f"🔐 JWT Secret: {'✅ Loaded' if JWT_SECRET else '⚠️  Using default'}")
 #     print("="*60)
-#     print("📚 API Documentation: http://localhost:8000/docs")
+#     print("📚 API Documentation: https://lexibridge-guax.onrender.com/docs")
 #     print("🌐 Frontend URL: http://localhost:3000")
 #     print("👤 Test User: test@example.com / Testpass123")
 #     print("="*60 + "\n")

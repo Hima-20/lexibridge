@@ -10,7 +10,7 @@ import Profile from './components/Profile';
 import Login from './components/Login';
 import Register from './components/Register';
 import Summary from './components/Summary';
-import TechStack from './components/TechStack';
+import TechStack from './components/Techstack';
 import AboutUs from './components/Aboutus';
 import Disclaimer from './components/Disclaimer';
 import Analysis from './components/Analysis';  

@@ -20,7 +20,7 @@ function History() {
 
   const fetchDocuments = async () => {
     try {
-      const response = await apiRequest('http://localhost:8000/documents');
+      const response = await apiRequest('https://lexibridge-guax.onrender.com/documents');
       const data = await response.json();
       setDocuments(data);
     } catch (error) {
@@ -37,7 +37,7 @@ function History() {
 
   const handleDownload = async (documentId, filename) => {
     try {
-      const response = await apiRequest(`http://localhost:8000/documents/${documentId}/download`);
+      const response = await apiRequest(`https://lexibridge-guax.onrender.com/documents/${documentId}/download`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -59,7 +59,7 @@ function History() {
     }
 
     try {
-      await apiRequest(`http://localhost:8000/documents/${documentId}`, {
+      await apiRequest(`https://lexibridge-guax.onrender.com/documents/${documentId}`, {
         method: 'DELETE',
       });
       // Remove from local state

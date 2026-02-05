@@ -96,7 +96,7 @@ function UploadDocument() {
       }, 300);
 
       // Upload the file to backend
-      const uploadResponse = await fetch('http://localhost:8000/upload-document', {
+      const uploadResponse = await fetch('https://lexibridge-guax.onrender.com/upload-document', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -152,7 +152,7 @@ function UploadDocument() {
       }
 
       // Call analyze endpoint
-      const analyzeResponse = await fetch('http://localhost:8000/analyze-document', {
+      const analyzeResponse = await fetch('https://lexibridge-guax.onrender.com/analyze-document', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

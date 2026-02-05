@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   // REAL Login function - calls backend
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:8000/login', {
+      const response = await fetch('https://lexibridge-guax.onrender.com/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
   // REAL Register function - calls backend
   const register = async (fullName, email, password) => {
     try {
-      const response = await fetch('http://localhost:8000/register', {
+      const response = await fetch('https://lexibridge-guax.onrender.com/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -48,7 +48,7 @@ function Analysis() {
       }
 
       // Fetch document info
-      const docResponse = await fetch(`http://localhost:8000/documents/${documentId}`, {
+      const docResponse = await fetch(`https://lexibridge-guax.onrender.com/documents/${documentId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -99,7 +99,7 @@ if (documentId) {
 }
 
 const response = await axios.post(
-  "http://localhost:8000/ask-ai",
+  "https://lexibridge-guax.onrender.com/ask-ai",
   formData,
   {
     headers: {

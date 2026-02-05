@@ -69,7 +69,7 @@ function Homepage() {
       formData.append('file', uploadedFile.file);
 
       // Upload the file to backend
-      const uploadResponse = await fetch('http://localhost:8000/upload-document', {
+      const uploadResponse = await fetch('https://lexibridge-guax.onrender.com/upload-document', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
