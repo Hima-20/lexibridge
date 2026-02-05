@@ -4,7 +4,7 @@ import { AuthProvider, ProtectedRoute } from './components/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Homepage from './components/Homepage';
-import HowItWorks from './components/HowItWorks';
+import HowItWorks from './components/HowitWorks';
 import History from './components/History';
 import Profile from './components/Profile';
 import Login from './components/Login';
