@@ -1,7 +1,7 @@
 import React from 'react';
 import { Brain, Upload, FileText, Shield, Zap, Clock, CheckCircle } from 'lucide-react';
 
-function HowItWorks() {
+function HowitWorks() {
   const steps = [
     {
       icon: <Upload size={24} />,
@@ -103,4 +103,4 @@ function HowItWorks() {
   );
 }
 
-export default HowItWorks;
+export default HowitWorks;
