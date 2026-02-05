@@ -1,9 +1,9 @@
 fastapi
 uvicorn
-groq
 pymongo
-PyMuPDF
 bcrypt
 PyJWT
-python-multipart
+groq
 python-dotenv
+PyMuPDF
+python-multipart
