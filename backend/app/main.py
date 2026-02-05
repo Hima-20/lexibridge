@@ -133,7 +133,7 @@ JWT_ALGORITHM = "HS256"
 
 # Initialize Groq client
 groq_client = None
-if GROQ_API_KEY or GROQ_API_KEY != "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":
+if GROQ_API_KEY:
     try:
         groq_client = Groq(api_key=GROQ_API_KEY)
         print("✅ Groq client initialized successfully")
