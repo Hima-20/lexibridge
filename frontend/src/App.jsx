@@ -43,7 +43,7 @@ function App() {
           
           <Route path="/how-it-works" element={
             <Layout>
-              <HowItWorks />
+              <HowitWorks />
             </Layout>
           } />
           
@@ -101,13 +101,13 @@ function App() {
           
           <Route path="/tech-stack" element={
             <Layout>
-              <TechStack />
+              <Techstack />
             </Layout>
           } />
           
           <Route path="/about-us" element={
             <Layout>
-              <AboutUs />
+              <Aboutus />
             </Layout>
           } />
           
