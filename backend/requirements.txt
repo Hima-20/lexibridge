@@ -6,3 +6,4 @@ PyMuPDF
 bcrypt
 PyJWT
 python-multipart
+python-dotenv
