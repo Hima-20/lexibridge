@@ -1,7 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Create Auth Context
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -18,51 +19,118 @@ export const AuthProvider = ({ children }) => {
   // Check if user is logged in on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('lexibridge_user');
-    if (savedUser) {
+    const token = localStorage.getItem('access_token');
+    
+    if (savedUser && token) {
       try {
-        setUser(JSON.parse(savedUser));
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
       } catch (error) {
         console.error('Error parsing saved user:', error);
         localStorage.removeItem('lexibridge_user');
+        localStorage.removeItem('access_token');
       }
     }
     setLoading(false);
   }, []);
 
-  // Login function
-  const login = (userData) => {
-    const user = {
-      id: Date.now(),
-      name: userData.name || userData.email.split('@')[0],
-      email: userData.email,
-      fullName: userData.fullName || userData.name,
-      isAuthenticated: true
-    };
-    
-    setUser(user);
-    localStorage.setItem('lexibridge_user', JSON.stringify(user));
-    return user;
+  // REAL Login function - calls backend
+  const login = async (email, password) => {
+    try {
+      const response = await fetch('http://localhost:8000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          username: email,
+          password: password
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Login failed');
+      }
+
+      const data = await response.json();
+      
+      if (!data.access_token) {
+        throw new Error('No access token received');
+      }
+      
+      const userData = {
+        id: data.user.id,
+        username: data.user.username,
+        email: data.user.email,
+        fullName: data.user.full_name || data.user.username,
+        isAuthenticated: true
+      };
+      
+      // Store both user data and token
+      setUser(userData);
+      localStorage.setItem('lexibridge_user', JSON.stringify(userData));
+      localStorage.setItem('access_token', data.access_token);
+      
+      return userData;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
-  // Register function
-  const register = (userData) => {
-    const user = {
-      id: Date.now(),
-      name: userData.fullName || userData.email.split('@')[0],
-      email: userData.email,
-      fullName: userData.fullName,
-      isAuthenticated: true
-    };
-    
-    setUser(user);
-    localStorage.setItem('lexibridge_user', JSON.stringify(user));
-    return user;
+  // REAL Register function - calls backend
+  const register = async (fullName, email, password) => {
+    try {
+      const response = await fetch('http://localhost:8000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: fullName,
+          email: email,
+          password: password,
+          full_name: fullName
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Registration failed');
+      }
+
+      const data = await response.json();
+      
+      if (!data.access_token) {
+        throw new Error('No access token received');
+      }
+      
+      const userData = {
+        id: data.user.id,
+        username: data.user.username,
+        email: data.user.email,
+        fullName: data.user.full_name || fullName,
+        isAuthenticated: true
+      };
+      
+      // Store both user data and token
+      setUser(userData);
+      localStorage.setItem('lexibridge_user', JSON.stringify(userData));
+      localStorage.setItem('access_token', data.access_token);
+      
+      return userData;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
   };
 
   // Logout function
   const logout = () => {
     setUser(null);
     localStorage.removeItem('lexibridge_user');
+    localStorage.removeItem('access_token');
   };
 
   // Update user function
@@ -73,6 +141,18 @@ export const AuthProvider = ({ children }) => {
     return updatedUser;
   };
 
+  // Get token function for API calls
+  const getToken = () => {
+    return localStorage.getItem('access_token');
+  };
+
+  // Check if authenticated
+  const isAuthenticated = () => {
+    const token = localStorage.getItem('access_token');
+    const savedUser = localStorage.getItem('lexibridge_user');
+    return !!token && !!savedUser;
+  };
+
   const value = {
     user,
     loading,
@@ -80,7 +160,8 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateUser,
-    isAuthenticated: !!user
+    getToken,
+    isAuthenticated
   };
 
   return (
@@ -90,9 +171,16 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Protected Route component
+// Protected Route component - FIXED: Separate component outside AuthProvider
 export const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (
@@ -103,11 +191,5 @@ export const ProtectedRoute = ({ children }) => {
     );
   }
 
-  if (!user) {
-    // Redirect to login if not authenticated
-    window.location.href = '/login';
-    return null;
-  }
-
-  return children;
+  return user ? children : null;
 };

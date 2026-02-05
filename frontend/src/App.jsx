@@ -11,8 +11,10 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Summary from './components/Summary';
 import TechStack from './components/TechStack';
-import AboutUs from './components/AboutUs';
+import AboutUs from './components/Aboutus';
 import Disclaimer from './components/Disclaimer';
+import Analysis from './components/Analysis';  
+import UploadDocument from './components/UploadDocument'; 
 import './App.css';
 
 // Layout Component for consistent header/footer
@@ -30,8 +32,8 @@ function Layout({ children }) {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <Routes>
           <Route path="/" element={
             <Layout>
@@ -73,6 +75,24 @@ function App() {
             </Layout>
           } />
           
+          {/* NEW ROUTES ADDED */}
+          <Route path="/analysis" element={
+            <Layout>
+              
+                <Analysis />
+              
+            </Layout>
+          } />
+          
+          <Route path="/upload" element={
+            <Layout>
+              <ProtectedRoute>
+                <UploadDocument />
+              </ProtectedRoute>
+            </Layout>
+          } />
+          {/* END NEW ROUTES */}
+          
           <Route path="/summary" element={
             <Layout>
               <Summary />
@@ -100,8 +120,8 @@ function App() {
           {/* Redirect any unknown routes to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

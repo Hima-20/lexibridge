@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FileText, Shield, Zap, Brain, Clock, Plus, ChevronRight } from 'lucide-react';
 
 function Homepage() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const navigate = useNavigate();
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -34,7 +36,8 @@ function Homepage() {
       name: file.name,
       size: (file.size / 1024 / 1024).toFixed(2),
       type: file.type.split('/').pop().toUpperCase(),
-      date: new Date().toLocaleDateString()
+      date: new Date().toLocaleDateString(),
+      file: file  // Store the actual file object
     });
   };
 
@@ -42,6 +45,58 @@ function Homepage() {
     const file = e.target.files[0];
     if (file) {
       handleFileUpload(file);
+    }
+  };
+
+  const handleUploadAndAnalyze = async () => {
+    if (!uploadedFile || !uploadedFile.file) {
+      alert('Please select a file first');
+      return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+      // Get JWT token from localStorage
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('file', uploadedFile.file);
+
+      // Upload the file to backend
+      const uploadResponse = await fetch('http://localhost:8000/upload-document', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (!uploadResponse.ok) {
+        if (uploadResponse.status === 401) {
+          localStorage.removeItem('access_token');
+          navigate('/login');
+          return;
+        }
+        const errorData = await uploadResponse.json();
+        throw new Error(errorData.detail || 'Upload failed');
+      }
+
+      const uploadData = await uploadResponse.json();
+      // console.log(uploadData)
+      // Navigate to analysis page with the document ID
+      localStorage.setItem('documentId', uploadData.documentId)
+      navigate('/analysis');
+      
+    } catch (error) {
+      alert(`Upload failed: ${error.message}`);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -152,9 +207,22 @@ function Homepage() {
           
           {uploadedFile && (
             <div className="upload-actions">
-              <button className="analyze-btn">
-                <Brain size={18} />
-                Analyze with AI
+              <button 
+                className="analyze-btn"
+                onClick={handleUploadAndAnalyze}
+                disabled={isUploading}
+              >
+                {isUploading ? (
+                  <>
+                    <div className="spinner"></div>
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Brain size={18} />
+                    Analyze with AI
+                  </>
+                )}
               </button>
             </div>
           )}
@@ -184,7 +252,7 @@ function Homepage() {
             ))}
           </div>
           
-          
+  
         </div>
       </section>
 
@@ -212,7 +280,9 @@ function Homepage() {
                     <span className="document-pages">{doc.pages} pages</span>
                   </div>
                 </div>
-                <button className="view-btn">View</button>
+                <button className="view-btn" onClick={() => navigate('/upload')}>
+                  View
+                </button>
               </div>
             ))}
           </div>
