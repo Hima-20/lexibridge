@@ -127,8 +127,8 @@ except Exception as e:
     responses_collection = InMemoryCollection()
 
 # API Keys
-GROQ_API_KEY = os.getenv("GROQ_API", "")
-JWT_SECRET = os.getenv("JWT_SECRET", "development_secret_key_change_in_production")
+GROQ_API_KEY = os.getenv("GROQ_API")
+JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_ALGORITHM = "HS256"
 
 # Initialize Groq client
