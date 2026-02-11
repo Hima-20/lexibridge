@@ -96,6 +96,7 @@ function Uploaddocument() {
       }, 300);
 
       // Upload the file to backend
+      console.log('Uploading document to server...');
       const uploadResponse = await fetch('https://lexibridge-guax.onrender.com/upload-document', {
         method: 'POST',
         headers: {
@@ -107,6 +108,8 @@ function Uploaddocument() {
       clearInterval(progressInterval);
       setUploadProgress(100);
 
+      console.log('Upload response status:', uploadResponse.status);
+      
       if (!uploadResponse.ok) {
         if (uploadResponse.status === 401) {
           localStorage.removeItem('lexibridge_user');
@@ -119,12 +122,23 @@ function Uploaddocument() {
       }
 
       const uploadData = await uploadResponse.json();
+      console.log('Upload response data:', uploadData);
       
-      if (!uploadData.success) {
-        throw new Error(uploadData.message || 'Upload failed');
+      // Try to get documentId from different possible response formats
+      let documentId = uploadData.documentId || uploadData.id || uploadData._id || uploadData.document_id;
+      
+      if (!documentId) {
+        console.error('No documentId found in response:', uploadData);
+        throw new Error('Upload failed - no document ID received from server');
       }
-      console.log(uploadData)
-      setUploadResult(uploadData);
+      
+      console.log('Document uploaded successfully. Document ID:', documentId);
+      
+      // Store the result with documentId
+      setUploadResult({
+        ...uploadData,
+        documentId: documentId
+      });
       setUploadSuccess(true);
       
     } catch (error) {
@@ -136,14 +150,14 @@ function Uploaddocument() {
   };
 
   const handleAnalyzeWithAI = async () => {
-    if (!uploadResult || !uploadResult.documentId) {
+    if (!uploadResult?.documentId) {
       setUploadError('No document to analyze');
       return;
     }
 
     setIsAnalyzing(true);
     setUploadError('');
-    
+
     try {
       const token = getToken();
       if (!token) {
@@ -151,42 +165,42 @@ function Uploaddocument() {
         return;
       }
 
-      // Call analyze endpoint
-      const analyzeResponse = await fetch('https://lexibridge-guax.onrender.com/analyze-document', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          documentId: uploadResult.documentId
-        })
-      });
+      console.log('Starting AI analysis for document:', uploadResult.documentId);
+      
+      // Optionally call analyze endpoint if needed
+      const analyzeResponse = await fetch(
+        'https://lexibridge-guax.onrender.com/analyze-document',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({ documentId: uploadResult.documentId })
+        }
+      );
 
       if (!analyzeResponse.ok) {
-        if (analyzeResponse.status === 401) {
-          localStorage.removeItem('lexibridge_user');
-          localStorage.removeItem('access_token');
-          navigate('/login');
-          return;
-        }
-        const errorData = await analyzeResponse.json();
-        throw new Error(errorData.detail || 'Analysis failed');
+        const err = await analyzeResponse.json();
+        console.warn('Analysis endpoint warning:', err.detail || 'Analysis failed');
+        // Continue anyway - we can still navigate
       }
 
-      const analyzeData = await analyzeResponse.json();
+      // ✅ CRITICAL: Navigate with documentId in URL parameter
+      console.log('Navigating to:', `/analysis/${uploadResult.documentId}`);
       
-      if (!analyzeData.success) {
-        throw new Error(analyzeData.message || 'Analysis failed');
-      }
+      // Store in localStorage as backup
+      localStorage.setItem('documentId', uploadResult.documentId);
       
-      // Navigate to analysis page with the document ID
-      localStorage.setItem('documentId', uploadResult.documentId)
-      navigate('/analysis');
-      
+      // Navigate to analysis page with documentId in URL
+      navigate(`/analysis/${uploadResult.documentId}`);
+
     } catch (error) {
-      console.error('Analysis error:', error);
-      setUploadError(`Analysis failed: ${error.message}`);
+      console.error('Analysis initiation error:', error);
+      // Even if analysis endpoint fails, still navigate
+      console.log('Navigating anyway with documentId:', uploadResult.documentId);
+      localStorage.setItem('documentId', uploadResult.documentId);
+      navigate(`/analysis/${uploadResult.documentId}`);
     } finally {
       setIsAnalyzing(false);
     }
@@ -199,186 +213,296 @@ function Uploaddocument() {
     setUploadSuccess(false);
     setUploadResult(null);
   };
-console.log(up)
-  return (
-    <div className="page-container">
-      <div className="page-header">
-        <h1>Upload Legal Document</h1>
-        <p>Upload your PDF document and analyze it with AI</p>
-      </div>
 
-      <div className="upload-section">
-        <div className="upload-container">
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">Upload Legal Document</h1>
+          <p className="text-gray-600">Upload your PDF document and get instant AI-powered analysis</p>
+        </div>
+
+        {/* Main Upload Section */}
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
           {uploadSuccess ? (
-            <div className="success-container">
-              <div className="success-icon">
-                <Check size={64} />
-              </div>
-              <h2>Upload Successful!</h2>
-              <p>Your document has been uploaded successfully.</p>
-              
-              <div className="upload-details">
-                <div className="detail-item">
-                  <FileText size={20} />
-                  <div>
-                    <h4>Document</h4>
-                    <p>{uploadedFile.name}</p>
-                  </div>
-                </div>
-                <div className="detail-item">
-                  <div>
-                    <h4>Status</h4>
-                    <p className="status-pending">Ready for AI Analysis</p>
-                  </div>
-                </div>
+            /* Success State */
+            <div className="p-8 text-center">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+                <Check className="h-10 w-10 text-green-600" />
               </div>
               
-              <div className="success-actions">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Upload Successful!</h2>
+              <p className="text-gray-600 mb-8">Your document has been uploaded successfully.</p>
+              
+              {/* Document Details */}
+              <div className="bg-gray-50 rounded-xl p-6 mb-8 max-w-md mx-auto">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="bg-blue-100 p-3 rounded-lg">
+                    <FileText className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-medium text-gray-900">Document</h4>
+                    <p className="text-sm text-gray-600 truncate max-w-xs">{uploadedFile.name}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <div className="bg-yellow-100 p-3 rounded-lg">
+                    <Brain className="h-6 w-6 text-yellow-600" />
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-medium text-gray-900">Status</h4>
+                    <p className="text-sm font-medium text-green-600">Ready for AI Analysis</p>
+                  </div>
+                </div>
+                
+                {/* Debug Info - Can be removed in production */}
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg text-left">
+                  <p className="text-xs text-blue-700 font-mono">
+                    Document ID: {uploadResult?.documentId || 'N/A'}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button 
-                  className="analyze-btn"
                   onClick={handleAnalyzeWithAI}
                   disabled={isAnalyzing}
+                  className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isAnalyzing ? (
                     <>
-                      <Loader2 className="animate-spin" size={20} />
+                      <Loader2 className="animate-spin h-5 w-5" />
                       <span>Analyzing with AI...</span>
                     </>
                   ) : (
                     <>
-                      <Brain size={20} />
+                      <Brain className="h-5 w-5" />
                       <span>Analyze with AI</span>
                     </>
                   )}
                 </button>
                 <button 
-                  className="btn-secondary"
-                  onClick={() => setUploadSuccess(false)}
+                  onClick={() => {
+                    setUploadSuccess(false);
+                    setUploadedFile(null);
+                    setUploadResult(null);
+                  }}
+                  className="px-8 py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors"
                 >
                   Upload Another
                 </button>
               </div>
+              
+              {/* Debug Info */}
+              <div className="mt-6 text-xs text-gray-500">
+                <p>Click "Analyze with AI" to navigate to: /analysis/{uploadResult?.documentId || 'document-id'}</p>
+              </div>
             </div>
           ) : (
-            <>
+            /* Upload State */
+            <div className="p-8">
+              {/* Drag & Drop Area */}
               <div 
-                className={`upload-card ${isDragging ? 'dragging' : ''} ${uploadedFile ? 'has-file' : ''}`}
+                className={`border-3 border-dashed rounded-2xl p-8 text-center transition-all duration-300 cursor-pointer mb-6 ${
+                  isDragging 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : uploadedFile 
+                    ? 'border-green-500 bg-green-50' 
+                    : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
+                }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                onClick={() => !uploadedFile && document.getElementById('file-upload').click()}
+                onClick={() => !uploadedFile && !isUploading && document.getElementById('file-upload').click()}
               >
-                <div className="upload-center">
-                  <div className="upload-icon">
+                <div className="mb-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
                     {isUploading ? (
-                      <Loader2 className="animate-spin" size={48} />
+                      <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
                     ) : (
-                      <FileUp size={48} />
+                      <FileUp className="h-8 w-8 text-blue-600" />
                     )}
                   </div>
                   
-                  <div className="upload-text">
-                    <h2>Upload your legal document</h2>
-                    <p>PDF documents only (max 25MB)</p>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    {isUploading ? 'Uploading Document...' : 'Upload your legal document'}
+                  </h2>
+                  <p className="text-gray-600">PDF documents only (max 25MB)</p>
+                </div>
+                
+                <input 
+                  type="file" 
+                  id="file-upload"
+                  className="hidden"
+                  onChange={handleFileInput}
+                  accept=".pdf"
+                  disabled={isUploading}
+                />
+                
+                {isUploading ? (
+                  /* Upload Progress */
+                  <div className="max-w-md mx-auto">
+                    <div className="bg-gray-200 rounded-full h-2 mb-3">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-sm text-gray-600">Uploading... {uploadProgress}%</p>
                   </div>
-                  
-                  <input 
-                    type="file" 
-                    id="file-upload"
-                    className="file-input"
-                    onChange={handleFileInput}
-                    accept=".pdf"
-                    disabled={isUploading}
-                  />
-                  
-                  {isUploading ? (
-                    <div className="upload-progress">
-                      <div className="progress-bar">
-                        <div 
-                          className="progress-fill"
-                          style={{ width: `${uploadProgress}%` }}
-                        ></div>
+                ) : !uploadedFile ? (
+                  /* No File Selected */
+                  <div className="max-w-md mx-auto">
+                    <div className="px-6 py-4 bg-gray-100 rounded-lg mb-3">
+                      <p className="font-medium text-gray-900 mb-1">Drag & drop files here</p>
+                      <p className="text-sm text-gray-600">or click to browse</p>
+                    </div>
+                    <p className="text-xs text-gray-500">Maximum file size: 25MB • PDF format only</p>
+                  </div>
+                ) : (
+                  /* File Selected */
+                  <div className="max-w-md mx-auto bg-white rounded-xl border border-gray-200 p-4">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-blue-100 p-3 rounded-lg">
+                        <FileText className="h-6 w-6 text-blue-600" />
                       </div>
-                      <p>Uploading... {uploadProgress}%</p>
-                    </div>
-                  ) : !uploadedFile ? (
-                    <div className="upload-instructions">
-                      <p>Drag & drop files here or click to browse</p>
-                      <p className="upload-note">Maximum file size: 25MB • PDF format only</p>
-                    </div>
-                  ) : (
-                    <div className="uploaded-file-info">
-                      <FileText size={24} />
-                      <div className="file-details">
-                        <h3>{uploadedFile.name}</h3>
-                        <p>{uploadedFile.size} MB • {uploadedFile.type} • {uploadedFile.date}</p>
+                      <div className="flex-1 text-left">
+                        <h3 className="font-medium text-gray-900 truncate">{uploadedFile.name}</h3>
+                        <p className="text-sm text-gray-600">
+                          {uploadedFile.size} MB • {uploadedFile.type} • {uploadedFile.date}
+                        </p>
                       </div>
                       <button 
-                        className="remove-file"
                         onClick={handleRemoveFile}
                         disabled={isUploading}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                       >
-                        <X size={20} />
+                        <X className="h-5 w-5 text-gray-500" />
                       </button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
               
+              {/* Error Message */}
               {uploadError && (
-                <div className="error-message">
-                  <AlertCircle size={20} />
-                  <span>{uploadError}</span>
+                <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+                  <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                  <span className="text-red-700">{uploadError}</span>
                 </div>
               )}
               
+              {/* Upload Button */}
               {uploadedFile && !isUploading && !uploadSuccess && (
-                <div className="upload-actions">
+                <div className="text-center">
                   <button 
-                    className="analyze-btn"
                     onClick={handleUpload}
                     disabled={isUploading}
+                    className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
                   >
                     {isUploading ? (
                       <>
-                        <Loader2 className="animate-spin" size={20} />
+                        <Loader2 className="animate-spin h-5 w-5" />
                         <span>Uploading...</span>
                       </>
                     ) : (
                       <>
-                        <Upload size={20} />
+                        <Upload className="h-5 w-5" />
                         <span>Upload Document</span>
                       </>
                     )}
                   </button>
+                  <p className="text-sm text-gray-500 mt-3">
+                    Click to upload and then analyze with AI
+                  </p>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
-      </div>
 
-      <div className="upload-info">
-        <div className="info-card">
-          <h3>How it works</h3>
-          <ol>
-            <li><strong>Upload</strong> your PDF document</li>
-            <li><strong>Click "Analyze with AI"</strong> after upload</li>
-            <li><strong>Get instant analysis</strong> with AI-powered insights</li>
-            <li><strong>Ask questions</strong> about your document</li>
-          </ol>
+        {/* Info Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* How it works */}
+          <div className="bg-white rounded-xl shadow p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <FileUp className="h-5 w-5 text-blue-600" />
+              </div>
+              How it works
+            </h3>
+            <ol className="space-y-3">
+              <li className="flex items-start gap-3">
+                <span className="flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-sm font-medium flex-shrink-0">1</span>
+                <div>
+                  <strong className="text-gray-900">Upload</strong> your PDF document
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-sm font-medium flex-shrink-0">2</span>
+                <div>
+                  <strong className="text-gray-900">Click "Upload Document"</strong> to send to server
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-sm font-medium flex-shrink-0">3</span>
+                <div>
+                  <strong className="text-gray-900">Click "Analyze with AI"</strong> after successful upload
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-sm font-medium flex-shrink-0">4</span>
+                <div>
+                  <strong className="text-gray-900">View AI analysis</strong> and ask questions about your document
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          {/* What AI analyzes */}
+          <div className="bg-white rounded-xl shadow p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <div className="bg-purple-100 p-2 rounded-lg">
+                <Brain className="h-5 w-5 text-purple-600" />
+              </div>
+              What AI analyzes
+            </h3>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span>Document type and purpose</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span>Key parties and their roles</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span>Important clauses and obligations</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span>Potential risks and red flags</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span>Payment terms and deadlines</span>
+              </li>
+            </ul>
+          </div>
         </div>
-        
-        <div className="info-card">
-          <h3>What AI analyzes</h3>
-          <ul>
-            <li>Document type and purpose</li>
-            <li>Key parties and their roles</li>
-            <li>Important clauses and obligations</li>
-            <li>Potential risks and red flags</li>
-            <li>Payment terms and deadlines</li>
-          </ul>
-        </div>
+
+        {/* User Info */}
+        {user && (
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-600">
+              Logged in as <span className="font-medium text-gray-900">{user.fullName || user.email}</span>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

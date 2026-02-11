@@ -35,96 +35,90 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // REAL Login function - calls backend
-  const login = async (email, password) => {
-    try {
-      const response = await fetch('https://lexibridge-guax.onrender.com/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          username: email,
-          password: password
-        })
-      });
+  // ONLY login & register functions changed
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Login failed');
-      }
+const login = async (email, password) => {
+  try {
+    const response = await fetch('https://lexibridge-guax.onrender.com/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        email: email,          // ✅ FIXED
+        password: password
+      })
+    });
 
-      const data = await response.json();
-      
-      if (!data.access_token) {
-        throw new Error('No access token received');
-      }
-      
-      const userData = {
-        id: data.user.id,
-        username: data.user.username,
-        email: data.user.email,
-        fullName: data.user.full_name || data.user.username,
-        isAuthenticated: true
-      };
-      
-      // Store both user data and token
-      setUser(userData);
-      localStorage.setItem('lexibridge_user', JSON.stringify(userData));
-      localStorage.setItem('access_token', data.access_token);
-      
-      return userData;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || 'Login failed');
     }
-  };
 
-  // REAL Register function - calls backend
-  const register = async (fullName, email, password) => {
-    try {
-      const response = await fetch('https://lexibridge-guax.onrender.com/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: fullName,
-          email: email,
-          password: password,
-          full_name: fullName
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Registration failed');
-      }
-
-      const data = await response.json();
-      
-      if (!data.access_token) {
-        throw new Error('No access token received');
-      }
-      
-      const userData = {
-        id: data.user.id,
-        username: data.user.username,
-        email: data.user.email,
-        fullName: data.user.full_name || fullName,
-        isAuthenticated: true
-      };
-      
-      // Store both user data and token
-      setUser(userData);
-      localStorage.setItem('lexibridge_user', JSON.stringify(userData));
-      localStorage.setItem('access_token', data.access_token);
-      
-      return userData;
-    } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
+    if (!data.access_token) {
+      throw new Error('No access token received');
     }
-  };
+
+    const userData = {
+      id: data.user.id,
+      username: data.user.username,
+      email: data.user.email,
+      fullName: data.user.fullName,
+      isAuthenticated: true
+    };
+
+    setUser(userData);
+    localStorage.setItem('lexibridge_user', JSON.stringify(userData));
+    localStorage.setItem('access_token', data.access_token);
+
+    return userData;
+
+  } catch (error) {
+    throw new Error(error.message || 'Login failed');
+  }
+};
+
+
+const register = async (fullName, email, password) => {
+  try {
+    const response = await fetch('https://lexibridge-guax.onrender.com/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded', // ✅ FIXED
+      },
+      body: new URLSearchParams({
+        username: fullName,    // ✅ FIXED
+        email: email,
+        password: password
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || 'Registration failed');
+    }
+
+    const userData = {
+      id: data.user.id,
+      username: data.user.username,
+      email: data.user.email,
+      fullName: data.user.fullName,
+      isAuthenticated: true
+    };
+
+    setUser(userData);
+    localStorage.setItem('lexibridge_user', JSON.stringify(userData));
+    localStorage.setItem('access_token', data.access_token);
+
+    return userData;
+
+  } catch (error) {
+    throw new Error(error.message || 'Registration failed');
+  }
+};
+
 
   // Logout function
   const logout = () => {

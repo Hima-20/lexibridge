@@ -20,9 +20,9 @@ import './App.css';
 // Layout Component for consistent header/footer
 function Layout({ children }) {
   return (
-    <div className="app-container">
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="main-content">
+      <main className="flex-grow">
         {children}
       </main>
       <Footer />
@@ -35,31 +35,17 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
+          {/* HOME */}
           <Route path="/" element={
             <Layout>
               <Homepage />
             </Layout>
           } />
           
+          {/* PUBLIC PAGES */}
           <Route path="/how-it-works" element={
             <Layout>
               <HowitWorks />
-            </Layout>
-          } />
-          
-          <Route path="/history" element={
-            <Layout>
-              <ProtectedRoute>
-                <History />
-              </ProtectedRoute>
-            </Layout>
-          } />
-          
-          <Route path="/profile" element={
-            <Layout>
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
             </Layout>
           } />
           
@@ -74,24 +60,6 @@ function App() {
               <Register />
             </Layout>
           } />
-          
-          {/* NEW ROUTES ADDED */}
-          <Route path="/analysis" element={
-            <Layout>
-              
-                <Analysis />
-              
-            </Layout>
-          } />
-          
-          <Route path="/upload" element={
-            <Layout>
-              <ProtectedRoute>
-                <Uploaddocument />
-              </ProtectedRoute>
-            </Layout>
-          } />
-          {/* END NEW ROUTES */}
           
           <Route path="/summary" element={
             <Layout>
@@ -114,6 +82,49 @@ function App() {
           <Route path="/disclaimer" element={
             <Layout>
               <Disclaimer />
+            </Layout>
+          } />
+          
+          {/* PROTECTED ROUTES */}
+          <Route path="/history" element={
+            <Layout>
+              <ProtectedRoute>
+                <History />
+              </ProtectedRoute>
+            </Layout>
+          } />
+          
+          <Route path="/profile" element={
+            <Layout>
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            </Layout>
+          } />
+          
+          <Route path="/upload" element={
+            <Layout>
+              <ProtectedRoute>
+                <Uploaddocument />
+              </ProtectedRoute>
+            </Layout>
+          } />
+          
+          {/* ✅ CRITICAL FIX: Analysis route with documentId parameter */}
+          <Route path="/analysis/:docId" element={
+            <Layout>
+              <ProtectedRoute>
+                <Analysis />
+              </ProtectedRoute>
+            </Layout>
+          } />
+          
+          {/* Optional: Keep fallback analysis route */}
+          <Route path="/analysis" element={
+            <Layout>
+              <ProtectedRoute>
+                <Analysis />
+              </ProtectedRoute>
             </Layout>
           } />
           

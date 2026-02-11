@@ -127,7 +127,7 @@ except Exception as e:
     responses_collection = InMemoryCollection()
 
 # API Keys
-GROQ_API_KEY = os.getenv("GROQ_API")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_ALGORITHM = "HS256"
 
@@ -897,7 +897,7 @@ async def startup_event():
 #     print("🚀 LEXIBRIDGE BACKEND SERVER")
 #     print("="*60)
 #     print(f"📁 Database: {'✅ Connected' if db else '⚠️  In-memory'}")
-#     print(f"🤖 AI Service: {'✅ Available' if groq_client else '⚠️  Mock (configure GROQ_API)'}")
+#     print(f"🤖 AI Service: {'✅ Available' if groq_client else '⚠️  Mock (configure GROQ_API_KEY)'}")
 #     print(f"🔐 JWT Secret: {'✅ Loaded' if JWT_SECRET else '⚠️  Using default'}")
 #     print("="*60)
 #     print("📚 API Documentation: https://lexibridge-guax.onrender.com/docs")
