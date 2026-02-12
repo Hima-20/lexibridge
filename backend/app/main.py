@@ -47,7 +47,10 @@ responses_collection = None
 
 try:
     # MongoDB connection
-    MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+    MONGO_URL = os.getenv("MONGO_URL")
+    if not MONGO_URL:
+        raise Exception("MONGO_URL not set in environment")
+
     print(f"🔗 Connecting to MongoDB: {MONGO_URL.split('@')[-1] if '@' in MONGO_URL else MONGO_URL}")
     
     client = MongoClient(MONGO_URL, serverSelectionTimeoutMS=5000)
@@ -603,14 +606,16 @@ async def analyze_document(
         print(f"⚠️  Failed to update user history: {e}")
     
     return {
-        "success": True,
-        "message": "Document analyzed successfully",
-        "responseId": response_id,
-        "documentId": documentId,
-        "documentName": document.get("documentName", "Unknown"),
-        "aiSummary": ai_summary,
-        "timestamp": datetime.utcnow().isoformat()
+    "success": True,
+    "message": "Document analyzed successfully",
+    "responseId": response_id,
+    "documentId": documentId,
+    "documentName": document.get("documentName", "Unknown"),
+    "aiSummary": ai_summary,
+    "aiResponse": ai_summary,  # ← IMPORTANT FIX (frontend expects this)
+    "timestamp": datetime.utcnow().isoformat()
     }
+
 
 @app.post("/ask-ai")
 async def ask_ai(
