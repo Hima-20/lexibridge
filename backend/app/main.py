@@ -481,34 +481,47 @@ async def upload_document(
         print(f"❌ Text extraction failed: {e}")
         raise HTTPException(status_code=400, detail=f"Failed to extract text from PDF: {str(e)}")
     
-    # Create document (without AI analysis yet)
+    # Auto-run AI analysis immediately on upload
+    print("🔄 Auto-running AI analysis on upload...")
+    ai_summary = ""
+    analysis_status = "pending"
+    try:
+        ai_summary = analyze_document_with_ai(extracted_text)
+        analysis_status = "completed"
+        print("✅ Auto AI analysis completed")
+    except Exception as e:
+        print(f"⚠️  Auto AI analysis failed (will stay pending): {e}")
+
+    # Create document with analysis already done
     document_doc = {
         "documentName": file.filename,
         "originalFilename": file.filename,
         "documentContent": extracted_text,
-        "aiSummary": "",  # Will be filled when user clicks "Analyze with AI"
+        "aiSummary": ai_summary,
         "userId": str(current_user["_id"]),
         "userName": current_user["username"],
         "fileSize": file_size,
         "createdAt": datetime.utcnow(),
         "updatedAt": datetime.utcnow(),
-        "analysisStatus": "pending"  # pending, analyzing, completed
+        "analysisStatus": analysis_status,
+        "analyzedAt": datetime.utcnow() if analysis_status == "completed" else None
     }
-    
+
     # Save to database
     result = documents_collection.insert_one(document_doc)
     document_id = str(result.inserted_id) if hasattr(result, 'inserted_id') else str(document_doc["_id"])
-    
+
     print(f"✅ Document saved to database: {document_id}")
-    
+
     return {
         "success": True,
-        "message": "Document uploaded successfully",
+        "message": "Document uploaded and analyzed successfully",
         "documentId": document_id,
         "documentName": file.filename,
         "extractedTextLength": len(extracted_text),
         "fileSize": file_size,
-        "analysisStatus": "pending"
+        "analysisStatus": analysis_status,
+        "aiSummary": ai_summary
     }
 
 @app.post("/analyze-document")
