@@ -5,21 +5,18 @@ function AboutUs() {
   const teamMembers = [
     {
       name: 'Hima Anjuri',
-      role: 'AI Research Lead',
-      expertise: 'Natural Language Processing, Legal Tech',
-      description: 'PhD in Computer Science with 10+ years in AI research'
+      role: 'Team Lead',
+      description: '22A21A05A2'
     },
     {
-      name: 'Kiran',
-      role: 'Legal Director',
-      expertise: 'Corporate Law, Compliance',
-      description: 'Former General Counsel with 15+ years legal experience'
+      name: 'Kiran Babu',
+      role: 'Team Member',
+      description: '23A25A0513'
     },
     {
-      name: 'Ravindra',
-      role: 'Lead Developer',
-      expertise: 'Full-stack Development, Cloud Architecture',
-      description: 'Expert in scalable web applications and AI integration'
+      name: 'Ravindra Sai',
+      role: 'Team Member',
+      description: '22A21A05C5'
     }
   ];
 
@@ -97,7 +94,6 @@ function AboutUs() {
                 </div>
               </div>
               <div className="team-content">
-                <p className="team-expertise"><strong>Expertise:</strong> {member.expertise}</p>
                 <p className="team-description">{member.description}</p>
               </div>
             </div>

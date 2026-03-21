@@ -82,20 +82,25 @@ except Exception as e:
             self.data = []
             self._id_counter = 1
             
+        def _matches(self, item, query):
+            """Check if an item matches a query dict, supporting $or."""
+            for key, value in query.items():
+                if key == "$or":
+                    if not any(self._matches(item, sub) for sub in value):
+                        return False
+                elif key == "_id":
+                    if str(item.get("_id")) != str(value):
+                        return False
+                else:
+                    if item.get(key) != value:
+                        return False
+            return True
+
         def find_one(self, query):
             if query == {}:
-                return None
+                return self.data[0] if self.data else None
             for item in self.data:
-                match = True
-                for key, value in query.items():
-                    if key == "_id":
-                        if str(item.get("_id")) != str(value):
-                            match = False
-                            break
-                    elif item.get(key) != value:
-                        match = False
-                        break
-                if match:
+                if self._matches(item, query):
                     return item
             return None
             
@@ -106,9 +111,9 @@ except Exception as e:
             return type('obj', (object,), {'inserted_id': document["_id"]})()
             
         def find(self, query=None):
-            if query is None:
+            if query is None or query == {}:
                 return self.data.copy()
-            return [item for item in self.data if all(item.get(k) == v for k, v in query.items())]
+            return [item for item in self.data if self._matches(item, query)]
             
         def update_one(self, query, update):
             item = self.find_one(query)
@@ -332,8 +337,8 @@ async def health_check():
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
         "services": {
-            "database": "connected" if db else "in-memory",
-            "ai_service": "available" if groq_client else "mock"
+            "database": "connected" if db is not None else "in-memory",
+            "ai_service": "available" if groq_client is not None else "mock"
         }
     }
 
@@ -871,29 +876,13 @@ async def test_upload(file: UploadFile = File(...)):
             "error": str(e)
         }
 
-# Create a test user on startup
 @app.on_event("startup")
 async def startup_event():
-    """Create test user on startup"""
-    try:
-        # Check if test user exists
-        test_user = users_collection.find_one({"email": "test@example.com"})
-        if not test_user:
-            # Create test user
-            hashed_password = hash_password("Testpass123")
-            user_doc = {
-                "username": "testuser",
-                "email": "test@example.com",
-                "password": hashed_password,
-                "fullName": "Test User",
-                "createdAt": datetime.utcnow(),
-                "updatedAt": datetime.utcnow(),
-                "chatHistory": []
-            }
-            users_collection.insert_one(user_doc)
-            print("✅ Test user created: test@example.com / Testpass123")
-    except Exception as e:
-        print(f"⚠️  Could not create test user: {e}")
+    """Run startup checks"""
+    print("🚀 Lexibridge API started")
+    print(f"📁 Database: {'✅ Connected' if db is not None else '⚠️  In-memory (data will be lost on restart)'}")
+    print(f"🤖 AI Service: {'✅ Available' if groq_client is not None else '⚠️  Mock (configure GROQ_API_KEY)'}")
+    print(f"🔐 JWT Secret: {'✅ Loaded' if JWT_SECRET else '⚠️  Using default (set JWT_SECRET in .env)'}")
 
 # if __name__ == "__main__":
 #     import uvicorn
