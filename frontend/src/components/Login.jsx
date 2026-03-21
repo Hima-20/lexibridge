@@ -5,17 +5,13 @@ import { useAuth } from './AuthContext';
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // 🔐 Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -25,57 +21,20 @@ function Login() {
       if (!formData.email || !formData.password) {
         throw new Error('Please fill in all fields');
       }
-
       const user = await login(formData.email, formData.password);
-
-      if (user) {
-        navigate('/');
-      }
+      if (user) navigate('/');
     } catch (err) {
-      console.error('Login error:', err);
-
-      // ✅ SAFE error extraction (prevents [object Object])
       setError(
-        typeof err === 'string'
-          ? err
-          : err?.message || 'Login failed. Please check your credentials.'
+        typeof err === 'string' ? err : err?.message || 'Login failed. Please check your credentials.'
       );
     } finally {
       setLoading(false);
     }
   };
 
-  // ✏️ Handle input change
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-
+    setFormData({ ...formData, [e.target.name]: e.target.value });
     if (error) setError('');
-  };
-
-  // 🧪 Demo login
-  const handleDemoLogin = async () => {
-    setFormData({
-      email: 'test@example.com',
-      password: 'Testpass123'
-    });
-
-    setLoading(true);
-    setError('');
-
-    try {
-      const user = await login('test@example.com', 'Testpass123');
-
-      if (user) {
-        navigate('/');
-      }
-    } catch (err) {
-      setError('Demo login failed. Please register a new account.');
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -89,12 +48,10 @@ function Login() {
               <Shield size={32} />
               <span>LexiBridge</span>
             </div>
-
             <h1>Welcome Back</h1>
             <p className="auth-subtitle">
               Sign in to continue your legal document analysis journey
             </p>
-
             <div className="auth-features">
               <div className="auth-feature">
                 <Sparkles size={20} />
@@ -111,13 +68,11 @@ function Login() {
         {/* RIGHT PANEL */}
         <div className="auth-right-panel">
           <div className="auth-card">
-
             <div className="auth-header">
               <h2>Login to LexiBridge</h2>
               <p>Access your AI legal document analysis account</p>
             </div>
 
-            {/* ❌ Error Message */}
             {error && (
               <div className="error-message">
                 <AlertCircle size={20} />
@@ -126,14 +81,12 @@ function Login() {
             )}
 
             <form onSubmit={handleSubmit} className="auth-form">
-
               {/* EMAIL */}
               <div className="form-group">
                 <label htmlFor="email" className="form-label">
                   <Mail size={20} />
                   <span>Email Address</span>
                 </label>
-
                 <div className="input-with-icon">
                   <input
                     type="email"
@@ -156,10 +109,9 @@ function Login() {
                   <Lock size={20} />
                   <span>Password</span>
                 </label>
-
                 <div className="input-with-icon">
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     id="password"
                     name="password"
                     value={formData.password}
@@ -169,7 +121,6 @@ function Login() {
                     className="form-input"
                     disabled={loading}
                   />
-
                   <button
                     type="button"
                     className="password-toggle"
@@ -178,17 +129,12 @@ function Login() {
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
-
                   <div className="input-border"></div>
                 </div>
               </div>
 
               {/* SUBMIT */}
-              <button
-                type="submit"
-                className="auth-submit-btn"
-                disabled={loading}
-              >
+              <button type="submit" className="auth-submit-btn" disabled={loading}>
                 {loading ? (
                   <div className="loading-spinner-small"></div>
                 ) : (
@@ -199,28 +145,12 @@ function Login() {
                 )}
               </button>
 
-              {/* FOOTER */}
               <div className="divider">
                 <span>Don't have an account?</span>
               </div>
-
               <div className="auth-footer">
                 <a href="/register" className="auth-link">Create Account</a>
               </div>
-
-              {/* DEMO LOGIN */}
-              <div className="demo-section">
-                <p className="demo-text">For testing purposes:</p>
-                <button
-                  type="button"
-                  className="demo-btn"
-                  onClick={handleDemoLogin}
-                  disabled={loading}
-                >
-                  Try Test Account
-                </button>
-              </div>
-
             </form>
           </div>
         </div>
