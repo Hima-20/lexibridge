@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cpu, Code, Database, Shield, Cloud, CpuIcon } from 'lucide-react';
+import { Cpu, Code, Database, Shield, Cloud, CpuIcon, FileText } from 'lucide-react';
 
 function TechStack() {
   const technologies = [
@@ -25,7 +25,7 @@ function TechStack() {
     },
     {
       category: 'Document Processing',
-      icon: <Document size={24} />,
+      icon: <FileText size={24} />,
       tech: ['PyMuPDF', 'tempfile', 'shutil']
     },
     {
