@@ -6,32 +6,32 @@ function TechStack() {
     {
       category: 'Frontend',
       icon: <Code size={24} />,
-      tech: ['React 18', 'TypeScript', 'Tailwind CSS', 'Vite', 'React Router']
+      tech: ['React.js', 'Tailwind CSS', 'React Router', 'Axios/Fetch API', 'Lucide React Icons']
     },
     {
       category: 'Backend',
       icon: <Cpu size={24} />,
-      tech: ['Node.js', 'Express.js', 'Python', 'FastAPI', 'REST APIs']
-    },
-    {
-      category: 'AI/ML',
-      icon: <CpuIcon size={24} />,
-      tech: ['GPT-4 API', 'TensorFlow', 'PyTorch', 'NLP Libraries', 'Custom AI Models']
+      tech: ['Python', 'FastAPI', 'Uvicorn']
     },
     {
       category: 'Database',
       icon: <Database size={24} />,
-      tech: ['PostgreSQL', 'MongoDB', 'Redis', 'Elasticsearch', 'AWS RDS']
+      tech: ['MongoDB', 'PyMongo']
     },
     {
-      category: 'Cloud & DevOps',
-      icon: <Cloud size={24} />,
-      tech: ['AWS EC2', 'Docker', 'Kubernetes', 'CI/CD Pipeline', 'NGINX']
+      category: 'AI Integration',
+      icon: <CpuIcon size={24} />,
+      tech: ['Groq API', 'LLM Model']
     },
     {
-      category: 'Security',
+      category: 'Document Processing',
+      icon: <Document size={24} />,
+      tech: ['PyMuPDF', 'tempfile', 'shutil']
+    },
+    {
+      category: 'Authentication & Security',
       icon: <Shield size={24} />,
-      tech: ['JWT Authentication', 'SSL/TLS', 'Data Encryption', 'GDPR Compliance', 'OWASP Standards']
+      tech: ['JWT Authentication', 'bcrypt', 'HTTPBearer']
     }
   ];
 
@@ -68,23 +68,23 @@ function TechStack() {
         <div className="architecture-diagram">
           <div className="arch-layer">
             <h4>Presentation Layer</h4>
-            <p>React-based user interface with responsive design</p>
+            <p>React.js frontend with Tailwind CSS for responsive design</p>
           </div>
           <div className="arch-layer">
             <h4>Application Layer</h4>
-            <p>Node.js/Express server handling API requests and business logic</p>
+            <p>FastAPI backend built with Python for APIs and business logic</p>
+          </div>
+          <div className="arch-layer">
+            <h4>Authentication Layer</h4>
+            <p>Handles user authentication using JWT tokens, bcrypt password hashing, and FastAPI security mechanisms.</p>
           </div>
           <div className="arch-layer">
             <h4>AI Processing Layer</h4>
-            <p>Python-based AI models for document analysis and NLP</p>
+            <p>Groq API & PyMuPDF for AI-driven document analysis </p>
           </div>
           <div className="arch-layer">
             <h4>Data Layer</h4>
-            <p>PostgreSQL for structured data, MongoDB for document storage</p>
-          </div>
-          <div className="arch-layer">
-            <h4>Infrastructure Layer</h4>
-            <p>AWS cloud services with Docker and Kubernetes orchestration</p>
+            <p>MongoDB database in the cloud for storing user data & documents</p>
           </div>
         </div>
       </div>
