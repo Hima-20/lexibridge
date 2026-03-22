@@ -104,12 +104,12 @@ function Homepage() {
     {
       icon: <Brain size={20} />,
       title: 'AI-Powered Analysis',
-      description: 'Advanced NLP models decode complex legal language'
+      description: 'Automatically analyzes uploaded PDF documents and generates structured, easy-to-understand summaries using AI.'
     },
     {
       icon: <Shield size={20} />,
       title: 'Risk Assessment',
-      description: 'Identify potential risks and compliance issues'
+      description: 'Highlights technical terms and compliance issues'
     },
     {
       icon: <FileText size={20} />,
@@ -124,8 +124,8 @@ function Homepage() {
   ];
 
   const recentDocuments = [
-    { name: 'NDA Agreement.pdf', date: 'Today, 10:30 AM', pages: 8 },
-    { name: 'Employment Contract.docx', date: 'Yesterday, 14:45', pages: 15 },
+    { name: 'SampleContractShuttle.pdf', date: 'Today, 10:30 AM', pages: 8 },
+    { name: 'pages-29-deed-sample.docx', date: 'Yesterday, 14:45', pages: 15 },
     { name: 'Lease Agreement.pdf', date: 'Nov 12, 2024', pages: 12 },
   ];
 

@@ -102,10 +102,7 @@ function Disclaimer() {
           <h2>Contact Information</h2>
           <p>
             For questions about this disclaimer or our terms of service, please contact our 
-            legal team at <strong>legal@lexibridge.ai</strong>
-          </p>
-          <p className="last-updated">
-            Last updated: January 29, 2024
+            legal team at <strong>lexibridgelegal@gmail.com</strong>
           </p>
         </div>
       </div>

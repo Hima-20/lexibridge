@@ -9,9 +9,8 @@ function Footer() {
       icon: <FileText size={20} />,
       links: [
         { name: 'Project Summary', href: '/summary' },
-        { name: 'Legal Intelligence', href: '#' },
-        { name: 'Risk Assessment', href: '#' },
-        { name: 'Compliance Review', href: '#' },
+        { name: 'Legal Intelligence', href: '/summary' },
+        { name: 'Risk Assessment', href: '/disclaimer' },
       ]
     },
     {
@@ -19,9 +18,8 @@ function Footer() {
       icon: <Cpu size={20} />,
       links: [
         { name: 'Tech Stack', href: '/tech-stack' },
-        { name: 'GPT-4 & Claude AI', href: '#' },
-        { name: 'TensorFlow NLP', href: '#' },
-        { name: 'AWS Infrastructure', href: '#' },
+        { name: 'Groq AI & LLM Model', href: '/tech-stack' },
+        { name: 'MongoDB', href: '/tech-stack' },
       ]
     },
     {
@@ -29,9 +27,8 @@ function Footer() {
       icon: <Shield size={20} />,
       links: [
         { name: 'Disclaimer', href: '/disclaimer' },
-        { name: 'Terms of Service', href: '#' },
-        { name: 'Privacy Policy', href: '#' },
-        { name: 'GDPR Compliance', href: '#' },
+        { name: 'Terms of Service', href: '/disclaimer' },
+        { name: 'Privacy Policy', href: '/disclaimer' },
       ]
     },
     {
@@ -40,8 +37,7 @@ function Footer() {
       links: [
         { name: 'About Us', href: '/about-us' },
         { name: 'History', href: '/history' },
-        { name: 'Careers', href: '#' },
-        { name: 'Contact', href: '#' },
+        { name: 'Contact', href: '/about-us' },
       ]
     }
   ];

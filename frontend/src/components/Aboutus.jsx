@@ -54,28 +54,28 @@ function AboutUs() {
               <Sparkles size={24} />
             </div>
             <h3>Innovation</h3>
-            <p>Continuously advancing AI technology for better legal analysis</p>
+            <p>We leverage cutting-edge AI technologies to continuously improve how legal documents are analyzed and interpreted.</p>
           </div>
           <div className="value-card">
             <div className="value-icon">
               <Heart size={24} />
             </div>
             <h3>Accessibility</h3>
-            <p>Making legal understanding available to all individuals and businesses</p>
+            <p>We simplify complex legal documents so that anyone can understand them easily, without requiring legal expertise.</p>
           </div>
           <div className="value-card">
             <div className="value-icon">
               <Shield size={24} />
             </div>
             <h3>Security</h3>
-            <p>Ensuring the highest standards of data protection and privacy</p>
+            <p>User data and documents are handled with strict security measures, ensuring confidentiality and safe processing.</p>
           </div>
           <div className="value-card">
             <div className="value-icon">
               <Award size={24} />
             </div>
-            <h3>Excellence</h3>
-            <p>Maintaining 99.7% accuracy in legal document analysis</p>
+            <h3>Accuracy</h3>
+            <p>We focus on delivering precise and reliable AI-generated insights to ensure users can trust the information provided.</p>
           </div>
         </div>
       </div>
